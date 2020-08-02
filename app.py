@@ -172,6 +172,17 @@ def update_planet():
         return jsonify(message="that planet does not exist, do you want to create it?"), 404
 
 
+@app.route('/remove_planet/<planet_id>', methods=['GET', 'DELETE'])
+def remove_planet(planet_id: int):
+    planet = Planet.query.filter_by(planet_id=planet_id).first()
+    if planet:
+        db.session.delete(planet)
+        db.session.commit()
+        return jsonify(message='Plane deleted'), 202
+    else:
+        return jsonify(message="That planed does not exist"), 404
+
+
 # database models
 
 class User(db.Model):
