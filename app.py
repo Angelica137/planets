@@ -18,7 +18,6 @@ app.config['MAIL_PORT'] = environ.get('MAIL_PORT')
 app.config['MAIL_USERNAME'] = environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = environ.get('MAIL_PASSWORD')
 app.config['MAIL_USE_TLS'] = environ.get('MAIL_USE_TLS')
-#app.config['MAIL_USE_SSL'] = environ.get('MAIL_USE_SSL')
 
 
 db = SQLAlchemy(app)
@@ -124,6 +123,15 @@ def retrieve_password(email: str):
     else:
         return jsonify(message='That email does not exist')
 
+
+@app.route('/planet_details/<int:planet_id>')
+def planet_details(planet_id: int):
+    planet = Planet.query.filter_by(planet_id=planet_id).first()
+    if planet:
+        result = planet_schema.dump(planet)
+        return jsonify(result)
+    else:
+        return jsonify(message="That planet does not exist"), 404
 
 # database models
 
