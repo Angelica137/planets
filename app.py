@@ -58,12 +58,14 @@ def url_vaiables(name: str, age: int):
     if age < 18:
         return jsonify(message="Soz " + name + ", you are not old enough"), 401
     else:
-        return jsnify(message="Welcome " + name + ", you are old enoyugh!")
+        return jsonify(message="Welcome " + name + ", you are old enoyugh!")
 
 
 @app.route('/planets', methods=['GET'])
 def planets():
     planets_list = Planet.query.all()
+    result = planets_schema.dump(planets_list)
+    return jsonify(result)
     
 
 
@@ -95,7 +97,7 @@ class UserSchema(ma.Schema):
 
 class PlanetSchema(ma.Schema):
     class Meta:
-        fielsds = ('planet_id', 'planet_name', 'planet_type', 'home_star', 'mass', 'radius', 'distance')
+        fields = ('planet_id', 'planet_name', 'planet_type', 'home_star', 'mass', 'radius', 'distance')
 
 
 user_schema = UserSchema()
@@ -103,7 +105,7 @@ users_schema = UserSchema(many=True)
 
 
 planet_schema = PlanetSchema()
-planets_schema = PlanetSchema(mamy=True)
+planets_schema = PlanetSchema(many=True)
 
 if __name__ == '__main__':    # these if pythin for scripting
     app.run()                 # all it does is to give an entry point
