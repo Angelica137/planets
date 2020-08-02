@@ -2,20 +2,29 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float
 import os
+from os import environ, path
+from dotenv import load_dotenv
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
+from flask_mail import Mail, Message
 
 
 app = Flask(__name__)                                     # these __x__ means thi particular app will take
 basedir = os.path.abspath(os.path.dirname(__file__))      # its name form the name of the script
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'planets.db')  # you can changfe these to hard coded string
+app.config['JWT_SECRET_KEY'] = environ.get('JWT_SECRET_KEY') # change this for the love of god
+app.config['MAIL_SERVER']= environ.get('MAIL_SERVER')
+app.config['MAIL_PORT'] = environ.get('MAIL_PORT')
+app.config['MAIL_USERNAME'] = environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = environ.get('MAIL_PASSWORD')
+app.config['MAIL_USE_TLS'] = environ.get('MAIL_USE_TLS')
+#app.config['MAIL_USE_SSL'] = environ.get('MAIL_USE_SSL')
 
-
-app.config['JWT_SECRET_KEY'] = 'super secret' # ∂chamge this for the love of god
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 jwt = JWTManager(app)
+mail = Mail(app)
 
 
 @app.cli.command('db_create')
@@ -103,6 +112,18 @@ def login():
           return jsonify(message='log in sucessful', access_token=access_token)
     else:
           return jsonify(message='Bad email or password'), 401
+
+
+@app.route('/retrieve_password/<string:email>')
+def retrieve_password(email: str):
+    user = User.query.filter_by(email=email).first()
+    if user:
+        msg = Message("your password is" + user.password, sender='amin@planets.com', recipients=[email])
+        mail.send(msg)
+        return jsonify(message="Password sent to " + email)
+    else:
+        return jsonify(message='That email does not exist')
+
 
 # database models
 
