@@ -155,6 +155,7 @@ def add_planet():
 
 
 @app.route('/update_planet', methods=['GET', 'PUT'])
+@jwt_required
 def update_planet():
     planet_id = int(request.form['planet_id'])
     planet = Planet.query.filter_by(planet_id=planet_id).first()
