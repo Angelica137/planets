@@ -173,6 +173,7 @@ def update_planet():
 
 
 @app.route('/remove_planet/<planet_id>', methods=['GET', 'DELETE'])
+@jwt_required
 def remove_planet(planet_id: int):
     planet = Planet.query.filter_by(planet_id=planet_id).first()
     if planet:
